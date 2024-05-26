@@ -1,0 +1,85 @@
+package TicTacToe;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeGUI extends JFrame {
+    private TicTacToe game;
+    private JButton[][] buttons;
+    private JLabel statusLabel;
+
+    public TicTacToeGUI() {
+        super("Tic Tac Toe");
+        game = new TicTacToe();
+        buttons = new JButton[3][3];
+        statusLabel = new JLabel("Current Player: " + game.getCurrentPlayer());
+        initializeGUI();
+    }
+
+    private void initializeGUI() {
+        JPanel panel = new JPanel(new GridLayout(4, 3));
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                JButton button = new JButton("-");
+                button.setFont(new Font("Arial", Font.PLAIN, 40));
+                button.addActionListener(new ButtonClickListener(i, j));
+                buttons[i][j] = button;
+                panel.add(button);
+            }
+        }
+
+        panel.add(statusLabel);
+
+        add(panel);
+        setSize(300, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        private int row, col;
+
+        public ButtonClickListener(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (game.makeMove(row, col)) {
+                updateButton(row, col);
+                char winner = game.checkWinner();
+                if (winner != '-') {
+                    statusLabel.setText("Player " + winner + " wins!");
+                    disableAllButtons();
+                } else {
+                    statusLabel.setText("Current Player: " + game.getCurrentPlayer());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid move!");
+            }
+        }
+
+        private void updateButton(int row, int col) {
+            char player = game.getCurrentPlayer();
+            buttons[row][col].setText(String.valueOf(player));
+            game.togglePlayer();
+        }
+
+        private void disableAllButtons() {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    buttons[i][j].setEnabled(false);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(TicTacToeGUI::new);
+    }
+}

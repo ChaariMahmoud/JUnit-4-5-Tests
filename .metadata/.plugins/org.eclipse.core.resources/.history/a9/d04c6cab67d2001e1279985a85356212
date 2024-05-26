@@ -1,0 +1,29 @@
+package TicTacToe;
+
+//TicTacToeTest.java
+import org.junit.Test;
+
+
+
+public class TicTacToeTest {
+ @Test
+ public void testMakeMove() {
+     TicTacToe game = new TicTacToe();
+     assertTrue(game.makeMove(0, 0));
+     assertFalse(game.makeMove(0, 0)); // Cell already occupied
+     assertTrue(game.makeMove(1, 1));
+     assertEquals('X', game.checkWinner()); // Only two moves, no winner yet
+ }
+
+ @Test
+ public void testCheckWinner() {
+     TicTacToe game = new TicTacToe();
+     game.makeMove(0, 0); // X
+     game.makeMove(1, 0); // O
+     game.makeMove(0, 1); // X
+     game.makeMove(1, 1); // O
+     game.makeMove(0, 2); // X
+     assertEquals('X', game.checkWinner()); // X wins horizontally
+ }
+}
+

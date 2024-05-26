@@ -1,0 +1,79 @@
+package TicTacToe;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeGUI extends JFrame {
+    private static final int BOARD_SIZE = 3;
+    private TicTacToe game;
+    private JButton[][] buttons;
+
+    public TicTacToeGUI() {
+        setTitle("Tic Tac Toe");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        setSize(300, 300);
+
+        game = new TicTacToe();
+        buttons = new JButton[BOARD_SIZE][BOARD_SIZE];
+
+        initializeBoard();
+    }
+
+    private void initializeBoard() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(100, 100));
+                button.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 40));
+                button.addActionListener(new ButtonClickListener(i, j));
+                buttons[i][j] = button;
+                add(button);
+            }
+        }
+
+        setVisible(true);
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        private int row, col;
+
+        public ButtonClickListener(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (game.makeMove(row, col)) {
+                buttons[row][col].setText(String.valueOf(game.getCurrentPlayer()));
+                buttons[row][col].setEnabled(false);
+                char winner = game.checkWinner();
+                if (winner != '-') {
+                    JOptionPane.showMessageDialog(TicTacToeGUI.this, "Player " + winner + " wins!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                    resetBoard();
+                } else if (game.isBoardFull()) {
+                    JOptionPane.showMessageDialog(TicTacToeGUI.this, "It's a draw!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                    resetBoard();
+                }
+            } else {
+                JOptionPane.showMessageDialog(TicTacToeGUI.this, "Invalid move!");
+            }
+        }
+    }
+
+    private void resetBoard() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                buttons[i][j].setText("");
+                buttons[i][j].setEnabled(true);
+            }
+        }
+      //  game.resetGame();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new TicTacToeGUI());
+    }
+}

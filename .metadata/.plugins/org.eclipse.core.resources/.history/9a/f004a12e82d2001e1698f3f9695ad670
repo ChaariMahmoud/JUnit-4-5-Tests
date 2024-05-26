@@ -1,0 +1,97 @@
+package TicTacToe;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeGUI extends JFrame implements ActionListener {
+    private static final int BOARD_SIZE = 3;
+    private static final char EMPTY_CELL = '-';
+    private static final char PLAYER_X = 'X';
+    private static final char PLAYER_O = 'O';
+
+    private JButton[][] buttons;
+    private TicTacToe game;
+
+    public TicTacToeGUI() {
+        game = new TicTacToe();
+        buttons = new JButton[BOARD_SIZE][BOARD_SIZE];
+        initializeGUI();
+    }
+
+    private void initializeGUI() {
+        setTitle("Tic Tac Toe");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+
+        // Create buttons for each cell
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(100, 100));
+                button.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 40));
+                button.addActionListener(this);
+                buttons[i][j] = button;
+                add(button);
+            }
+        }
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JButton buttonClicked = (JButton) e.getSource();
+        int row = -1, col = -1;
+
+        // Find the row and column of the clicked button
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (buttons[i][j] == buttonClicked) {
+                    row = i;
+                    col = j;
+                    break;
+                }
+            }
+        }
+
+        // Make a move in the game
+        try {
+            game.play(row, col);
+            updateButton(buttonClicked, game.getCurrentPlayer());
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid move: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Check for game over
+        char winner = game.checkWinner();
+        if (winner != EMPTY_CELL || game.isGameOver()) {
+            String message = (winner != EMPTY_CELL) ? "Player " + winner + " wins!" : "It's a draw!";
+            JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            resetGame();
+        }
+    }
+
+    private void updateButton(JButton button, char player) {
+        button.setText(String.valueOf(player));
+        button.setEnabled(false);
+    }
+
+    private void resetGame() {
+        // Clear board and enable all buttons
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                buttons[i][j].setText("");
+                buttons[i][j].setEnabled(true);
+            }
+        }
+        game = new TicTacToe();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new TicTacToeGUI());
+    }
+}
